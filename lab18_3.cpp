@@ -9,7 +9,7 @@ using namespace std;
 
 struct student{
 	//Define struct student with four member (name ,id , gender, gpa);
-	char name[100];
+	string name;
 	int id;
 	char gender;
 	double gpa;
@@ -22,7 +22,7 @@ struct course{
 	vector<student *> student_list;
 };
 
-student * findstudent(vector<student> allstudents,int key){ //Correct this line
+student * findstudent(vector<student> &allstudents,int key){ //Correct this line
 	for(unsigned int i = 0; i < allstudents.size(); i++){
 		if(allstudents[i].id  == key) return &allstudents[i];
 	}
@@ -40,7 +40,7 @@ void printreport(vector<course> allcourses){
 		cout << "\n\nStudents:\t";
 		for(unsigned int j = 0; j < allcourses[i].student_list.size();j++){
 			if(j != 0) cout << "\t\t";
-			cout << setw(15) << left << allcourses[i].student_list[j]->name << "\t";
+			cout << setw(20) << left << allcourses[i].student_list[j]->name << "\t";
 			cout << allcourses[i].student_list[j]->id << "\t";
 			cout << allcourses[i].student_list[j]->gender << "\t";
 			cout << allcourses[i].student_list[j]->gpa << "\n";
@@ -57,14 +57,19 @@ int main(){
 	vector<course> allcourses;
 	
 	string textline;
+
+	char name1[100]; 
+	int id1; 
+	char gender1,format[]="%[^,],%d,%c,%f"; 
+	float gpa1;
 	
 	while(getline(student_file,textline)){
-		student s; 
 		//Assign value to the members of struct s;
-		sscanf(textline.c_str(),"%s,%d,%c,%d",s.name,&s.id,s.gender,&s.gpa);
-		allstudents.push_back(s); 		
+		sscanf(textline.c_str(),format,name1,&id1,&gender1,&gpa1);
+		student s={name1,id1,gender1,gpa1};
+		allstudents.push_back(s); 
 	}
-	
+
 	int state = 1;
 	while(getline(course_file,textline)){
 		if(state == 1){
@@ -80,21 +85,18 @@ int main(){
 				state = 3;
 			}else{
 				//Append lecture_list;
-				course c;
-				c.lecture_list.push_back(textline);
-				allcourses.push_back(c);
+				allcourses[allcourses.size()-1].lecture_list.push_back(textline);
 			}			
 		}else{
 			if(textline == "---------------------------------------"){
 				state = 1;
 			}else{
 				student *p = findstudent(allstudents,atof(textline.c_str()));
-				course c;
-				c.student_list.push_back(p);
-				allcourses.push_back(c);
+				allcourses[allcourses.size()-1].student_list.push_back(p);
 			}
 		}
 	}
+
 	printreport(allcourses);
 	
 }
